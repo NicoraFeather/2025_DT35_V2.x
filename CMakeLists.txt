@@ -41,7 +41,9 @@ add_executable(${CMAKE_PROJECT_NAME}
         Core/Src/callback.c
         Core/Src/callback.h
         Core/Src/uart_command.c
-        Core/Src/uart_command.h)
+        Core/Src/uart_command.h
+        Lib/Src/functional.c
+)
 
 # Add STM32CubeMX generated sources
 add_subdirectory(cmake/stm32cubemx)
@@ -58,6 +60,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
 
 # Add include paths
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
+        Lib/Inc
     # Add user defined include paths
 )
 
@@ -71,4 +74,10 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
     stm32cubemx
 
     # Add user defined libraries
+)
+
+
+add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_OBJCOPY} -O ihex ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.elf ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.hex
+        COMMENT "Generating HEX file"
 )

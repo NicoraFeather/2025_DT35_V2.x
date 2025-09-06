@@ -8,5 +8,5 @@ uint16_t ADC_values[4]={0};
 
 void ADC_Init(void)
 {
-    HAL_ADC_Start_DMA(&hadc1, ADC_values, sizeof(ADC_values)/sizeof(ADC_values[0]));
+    HAL_ADC_Start_DMA(&hadc1, ADC_values, 4);
 }

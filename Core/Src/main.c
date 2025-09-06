@@ -50,6 +50,7 @@
 
 /* USER CODE BEGIN PV */
 extern DMA_HandleTypeDef hdma_usart3_rx;
+extern DMA_HandleTypeDef hdma_usart1_rx;
 uint8_t Com_Buff[50]={0};
 
 //0x030
@@ -57,8 +58,8 @@ float k_0 = 0.0f;
 float b_0 = 0.0f;
 
 //0x031
-float k_1 = 0.0f;
-float b_1 = 0.0f;
+float k_1 = 0.00007175f;
+float b_1 = 0.04835656f;
 
 //0x032
 float k_2 = 0.0f;
@@ -119,10 +120,13 @@ int main(void)
   MX_CAN1_Init();
   /* USER CODE BEGIN 2 */
   ADC_Init();
-  //HAL_TIM_Base_Start_IT(&htim10);
+  HAL_TIM_Base_Start_IT(&htim10);
 
   HAL_UARTEx_ReceiveToIdle_DMA(&huart3, Com_Buff, 50);
   __HAL_DMA_DISABLE_IT(&hdma_usart3_rx, DMA_IT_HT);
+
+  HAL_UARTEx_ReceiveToIdle_DMA(&huart1, Com_Buff, 50);
+  __HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
   /* USER CODE END 2 */
 
   /* Infinite loop */
