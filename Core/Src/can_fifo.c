@@ -2,7 +2,7 @@
 // Created by lak19 on 2025/9/7.
 //
 
-#include "can_fifo.h"
+#include "../Inc/can_fifo.h"
 
 #include "can.h"
 

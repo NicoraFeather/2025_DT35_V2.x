@@ -39,12 +39,14 @@ add_executable(${CMAKE_PROJECT_NAME}
         Core/Src/adc_scan.c
         Core/Inc/adc_scan.h
         Core/Src/callback.c
-        Core/Src/callback.h
+        Core/Inc/callback.h
         Core/Src/uart_command.c
-        Core/Src/uart_command.h
+        Core/Inc/uart_command.h
         Lib/Src/functional.c
         Core/Src/can_fifo.c
-        Core/Src/can_fifo.h
+        Core/Inc/can_fifo.h
+        Lib/Src/flash_param.c
+        Lib/Inc/flash_param.h
 )
 
 # Add STM32CubeMX generated sources
@@ -82,4 +84,9 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
 add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_OBJCOPY} -O ihex ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.elf ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.hex
         COMMENT "Generating HEX file"
+)
+
+target_link_options(${PROJECT_NAME} PRIVATE
+        -u_printf_float
+        -u_scanf_float
 )

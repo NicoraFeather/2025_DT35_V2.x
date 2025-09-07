@@ -27,9 +27,12 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <string.h>
+
 #include "adc_scan.h"
-#include "callback.h"
+#include "../Inc/callback.h"
 #include "can_fifo.h"
+#include "flash_param.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -52,8 +55,11 @@
 /* USER CODE BEGIN PV */
 extern DMA_HandleTypeDef hdma_usart3_rx;
 extern DMA_HandleTypeDef hdma_usart1_rx;
+extern uint16_t can_id[4];             // 4 路 DT35 的 CAN ID
+extern float calib_k[4], calib_b[4]; // 每个 DT35 的线性系数
 
 uint8_t Com_Buff[50]={0};
+extern uint8_t param_flag;
 extern CanFifo_t can_fifo;
 /* USER CODE END PV */
 
@@ -113,6 +119,13 @@ int main(void)
 
   HAL_UARTEx_ReceiveToIdle_DMA(&huart1, Com_Buff, 50);
   __HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
+
+  /* 上电就读 */
+  PARAM_Load();
+  /* 把值灌进业务变量 */
+  memcpy(calib_k,  param.k,     sizeof(param.k));
+  memcpy(calib_b,  param.b,     sizeof(param.b));
+  memcpy(can_id,   param.can_id,sizeof(param.can_id));
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -120,6 +133,15 @@ int main(void)
   while (1)
   {
      can_send_from_fifo();
+    if (param_flag == 1)
+    {
+      param_flag = 0;
+      memcpy(param.k,     calib_k,  sizeof(param.k));
+      memcpy(param.b,     calib_b,  sizeof(param.b));
+      memcpy(param.can_id, can_id, sizeof(param.can_id));
+    }
+    /* 一键落盘 */
+    PARAM_Save();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
