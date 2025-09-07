@@ -43,6 +43,8 @@ add_executable(${CMAKE_PROJECT_NAME}
         Core/Src/uart_command.c
         Core/Src/uart_command.h
         Lib/Src/functional.c
+        Core/Src/can_fifo.c
+        Core/Src/can_fifo.h
 )
 
 # Add STM32CubeMX generated sources

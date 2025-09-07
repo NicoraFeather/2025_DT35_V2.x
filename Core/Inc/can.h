@@ -41,7 +41,16 @@ extern CAN_HandleTypeDef hcan1;
 void MX_CAN1_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-  void CAN_SendMessage(CAN_HandleTypeDef *hcan, uint16_t ID, uint8_t *DataBuff, uint8_t Len);
+    typedef enum {
+        CAN_TX_OK      = 0,
+        CAN_TX_BUSY    = 1,
+        CAN_TX_FAIL    = 2
+      } CanTxResult_e;
+
+  CanTxResult_e CAN_SendMessage(CAN_HandleTypeDef *hcan,
+                                uint16_t ID,
+                                const uint8_t *DataBuff,
+                                uint8_t Len);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

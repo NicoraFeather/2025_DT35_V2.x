@@ -42,4 +42,5 @@ void USART_Parse_Command(char *str)
         HAL_UART_Transmit(&huart3, message, strlen(message), HAL_MAX_DELAY);
         HAL_UART_Transmit(&huart1, message, strlen(message), HAL_MAX_DELAY);
     }
+    memset(str, 0, sizeof(str));
 }

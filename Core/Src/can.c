@@ -143,19 +143,31 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
 }
 
 /* USER CODE BEGIN 1 */
-void CAN_SendMessage(CAN_HandleTypeDef *hcan, uint16_t ID, uint8_t *DataBuff, uint8_t Len)
+
+
+CanTxResult_e CAN_SendMessage(CAN_HandleTypeDef *hcan,
+                              uint16_t ID,
+                              const uint8_t *DataBuff,
+                              uint8_t Len)
 {
-  /*定义CAN消息的发送头信息*/
-  CAN_TxHeaderTypeDef txHeader;
-  txHeader.StdId = ID;      // 标准标识符:1号电调
-  txHeader.IDE = CAN_ID_STD;   // 标准帧    IDE:指示使用标准标识符还是扩展标识符
-  txHeader.RTR = CAN_RTR_DATA; // 数据帧    RTR:指示消息的远程发送请求状态
-  txHeader.DLC = Len;            // 数据长度  DLC:指定消息的数据长度(字节)
-  /*指定CAN控制器的发送邮箱*/
-  uint32_t txMailbox = CAN_TX_MAILBOX0;
-  // 发送
-  HAL_CAN_AddTxMessage(hcan, &txHeader, DataBuff, &txMailbox);
-  //等待发送完毕
-  while(HAL_CAN_GetTxMailboxesFreeLevel(hcan) != 3);
+  if (Len > 8) return CAN_TX_FAIL;
+
+  CAN_TxHeaderTypeDef txHeader = {
+    .StdId = ID,
+    .IDE   = CAN_ID_STD,
+    .RTR   = CAN_RTR_DATA,
+    .DLC   = Len
+};
+
+  uint32_t txMailbox;
+  /* 尝试拿一个空邮箱，非阻塞 */
+  if (HAL_CAN_GetTxMailboxesFreeLevel(hcan) == 0)
+    return CAN_TX_BUSY;
+
+  /* 真正投递，如果返回HAL_OK说明硬件已接管 */
+  if (HAL_CAN_AddTxMessage(hcan, &txHeader, (uint8_t *)DataBuff, &txMailbox) != HAL_OK)
+    return CAN_TX_FAIL;
+
+  return CAN_TX_OK;
 }
 /* USER CODE END 1 */

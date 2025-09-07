@@ -29,6 +29,7 @@
 /* USER CODE BEGIN Includes */
 #include "adc_scan.h"
 #include "callback.h"
+#include "can_fifo.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -51,24 +52,9 @@
 /* USER CODE BEGIN PV */
 extern DMA_HandleTypeDef hdma_usart3_rx;
 extern DMA_HandleTypeDef hdma_usart1_rx;
+
 uint8_t Com_Buff[50]={0};
-
-//0x030
-float k_0 = 0.0f;
-float b_0 = 0.0f;
-
-//0x031
-float k_1 = 0.00007175f;
-float b_1 = 0.04835656f;
-
-//0x032
-float k_2 = 0.0f;
-float b_2 = 0.0f;
-
-//0x033
-float k_3 = 0.0f;
-float b_3 = 0.0f;
-
+extern CanFifo_t can_fifo;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -133,6 +119,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+     can_send_from_fifo();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
