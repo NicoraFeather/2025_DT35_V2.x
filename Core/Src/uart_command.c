@@ -11,7 +11,7 @@
 #include "usart.h"
 extern uint8_t run_flag;
 extern uint8_t calibration_flag;
-extern uint8_t param_flag = 0;
+extern uint8_t param_flag;
 extern uint8_t  calib_id;              // 当前正在标定的 DT35 编号
 extern uint16_t can_id[4];             // 4 路 DT35 的 CAN ID
 extern float calib_k[4], calib_b[4]; // 每个 DT35 的线性系数

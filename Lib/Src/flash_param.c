@@ -30,6 +30,10 @@ void PARAM_Load(void)
             param.can_id[i] = 100 + i;   // 缺省 100 101 102 103
         }
     }
+
+    // uint32_t *p = (uint32_t *)PARAM_FLASH_ADDR;
+    // uint32_t  val = *p;        // 故意读一下，验证扇区地址合理性
+    // (void)val;                 // 防止被优化
 }
 
 /* 整扇区擦除 + 写入 */

@@ -11,7 +11,7 @@
 #include <string.h>
 
 /* 参数扇区：F4 1 MB 版  扇区 11  128 kB  首地址 */
-#define PARAM_FLASH_ADDR     0x081E0000UL
+#define PARAM_FLASH_ADDR     0x0807C000UL   // 最后 16 kB 扇区 11
 #define PARAM_MAGIC          0x1234BEEFUL
 
 /* 一次性存全部参数 */
