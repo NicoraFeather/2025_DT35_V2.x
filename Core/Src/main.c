@@ -32,7 +32,7 @@
 #include "adc_scan.h"
 #include "../Inc/callback.h"
 #include "can_fifo.h"
-#include "flash_param.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -119,13 +119,6 @@ int main(void)
 
   HAL_UARTEx_ReceiveToIdle_DMA(&huart1, Com_Buff, 50);
   __HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
-
-  /* 上电就读 */
-  PARAM_Load();
-  /* 把值灌进业务变量 */
-  memcpy(calib_k,  param.k,     sizeof(param.k));
-  memcpy(calib_b,  param.b,     sizeof(param.b));
-  memcpy(can_id,   param.can_id,sizeof(param.can_id));
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -133,15 +126,7 @@ int main(void)
   while (1)
   {
      can_send_from_fifo();
-    if (param_flag == 1)
-    {
-      param_flag = 0;
-      memcpy(param.k,     calib_k,  sizeof(param.k));
-      memcpy(param.b,     calib_b,  sizeof(param.b));
-      memcpy(param.can_id, can_id, sizeof(param.can_id));
-    }
-    /* 一键落盘 */
-    PARAM_Save();
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

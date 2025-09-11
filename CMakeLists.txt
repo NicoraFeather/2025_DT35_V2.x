@@ -40,13 +40,9 @@ add_executable(${CMAKE_PROJECT_NAME}
         Core/Inc/adc_scan.h
         Core/Src/callback.c
         Core/Inc/callback.h
-        Core/Src/uart_command.c
-        Core/Inc/uart_command.h
         Lib/Src/functional.c
         Core/Src/can_fifo.c
         Core/Inc/can_fifo.h
-        Lib/Src/flash_param.c
-        Lib/Inc/flash_param.h
 )
 
 # Add STM32CubeMX generated sources
