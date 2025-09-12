@@ -59,7 +59,7 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 
 /* USER CODE BEGIN Private defines */
-
+#define COM_BUFF_SIZE 50
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

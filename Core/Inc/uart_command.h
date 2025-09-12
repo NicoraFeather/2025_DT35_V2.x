@@ -6,5 +6,8 @@
 #define UART_COMMAND_H
 
 #include "callback.h"
+
 void USART_Parse_Command(char *str);
+void change_flag();
+
 #endif //UART_COMMAND_H

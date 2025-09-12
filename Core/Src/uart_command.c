@@ -14,7 +14,12 @@ extern uint8_t calibration_flag;
 extern uint8_t  calib_id;              // 当前正在标定的 DT35 编号
 extern uint16_t can_id[4];             // 4 路 DT35 的 CAN ID
 extern float calib_k[4], calib_b[4];   // 每个 DT35 的线性系数
-uint8_t flash_flag = 0;
+extern uint8_t Flash_flag;
+
+void change_flag()
+{
+    Flash_flag = 1; // 测试函数
+}
 
 void USART_Parse_Command(char *str)
 {
@@ -66,7 +71,7 @@ void USART_Parse_Command(char *str)
         float k = 0.0f, b = 0.0f;
         if (sscanf(str + 18, "%d %f %f", &id, &k, &b) == 3 && id >= 0 && id <= 3)
         {
-            flash_flag = 1; // 标记参数已改，需要落盘
+            Flash_flag = 1; // 标记参数已改，需要落盘
             calib_k[id] = k;
             calib_b[id] = b;
             sprintf(resp, "DT35-%d  k=%.4f  b=%.4f  written\r\n", id, k, b);
@@ -81,7 +86,7 @@ void USART_Parse_Command(char *str)
         int i0, i1, i2, i3;
         if (sscanf(str + 14, "%d %d %d %d", &i0, &i1, &i2, &i3) == 4)
         {
-            flash_flag = 1; // 标记参数已改，需要落盘
+            Flash_flag = 1; // 标记参数已改，需要落盘
             can_id[0] = (uint16_t)i0;
             can_id[1] = (uint16_t)i1;
             can_id[2] = (uint16_t)i2;
@@ -101,13 +106,12 @@ void USART_Parse_Command(char *str)
     /* 展示 ADC0~ADC3 的 CAN 地址、k、b -----------------------*/
     else if (strcmp(str, "show") == 0)
     {
-        /* 一次拼完再发，减少 DMA 次数 */
         int n = 0;
         n += sprintf(resp + n, "ADC  CAN   k         b\r\n");
         for (int i = 0; i < 4; i++)
         {
             n += sprintf(resp + n, "ADC%d %04X  %f  %f\r\n",
-                         i, can_id[i], calib_k[i], calib_b[i]);
+                         Flash_flag, can_id[i], calib_k[i], calib_b[i]);
         }
     }
     /* unknown ----------------------------------------------------------*/
@@ -119,5 +123,5 @@ void USART_Parse_Command(char *str)
     HAL_UART_Transmit(&huart1, (uint8_t *)resp, strlen(resp), HAL_MAX_DELAY);
 
     /* 清空接收缓冲区 */
-    memset(str, 0, 128);
+    memset(str, 0, COM_BUFF_SIZE);
 }

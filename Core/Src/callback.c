@@ -16,7 +16,7 @@ extern DMA_HandleTypeDef hdma_usart3_rx;
 extern DMA_HandleTypeDef hdma_usart1_rx;
 extern uint8_t Com_Buff[50]; //存储串口接收数据
 extern uint16_t ADC_values[4]; //0~4095的整形数值
-extern uint8_t flash_flag;
+extern uint8_t Flash_flag;
 
 float calib_k[4] = {0.0f, 0.00115245f, 0.0f, 0.0f}; // 每个 DT35 的线性系数
 float calib_b[4] = {0.0f, 0.04327176f, 0.0f, 0.0f}; // 每个 DT35 的线性系数
@@ -31,16 +31,15 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) //10ms定时器回�
 
     if (htim->Instance == TIM10) //10ms定时器
     {
-        if (flash_flag == 1)
-        {
-            //flash_flag = 0;
-            //uint8_t message[50] = {0};
-            //sprintf((char *) message, "Parameters updated to Flash\r\n");
-            //HAL_UART_Transmit(&huart1, message, strlen((char *) message), HAL_MAX_DELAY);
-            calib_b[0] = 1000;
-            //DT35_Flash_Update(); //参数更新到Flash
-        }
-
+        // if (flash_flag == 1)
+        // {
+        //     flash_flag = 0;
+        //     //uint8_t message[50] = {0};
+        //     //sprintf((char *) message, "Parameters updated to Flash\r\n");
+        //     //HAL_UART_Transmit(&huart1, message, strlen((char *) message), HAL_MAX_DELAY);
+        //     calib_b[0] = 1000;
+        //     //DT35_Flash_Update(); //参数更新到Flash
+        // }
         i++;
         float distance[4];
         for (uint8_t j = 0; j < 4; j++)
@@ -100,9 +99,10 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
         USART_Parse_Command(Com_Buff); //解析指令
 
         //重新开启DMA接收
-        HAL_UARTEx_ReceiveToIdle_DMA(huart, Com_Buff, 128);
+        HAL_UARTEx_ReceiveToIdle_DMA(huart, Com_Buff, COM_BUFF_SIZE);
         __HAL_DMA_DISABLE_IT(&hdma_usart3_rx, DMA_IT_HT);
-    } else if (huart->Instance == USART1)
+    }
+    else if (huart->Instance == USART1)
     {
         uint8_t message[50] = {0};
         sprintf(message, ">>>%s\r\n", Com_Buff);
@@ -111,7 +111,7 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
         USART_Parse_Command(Com_Buff); //解析指令
 
         //重新开启DMA接收
-        HAL_UARTEx_ReceiveToIdle_DMA(huart, Com_Buff, 128);
+        HAL_UARTEx_ReceiveToIdle_DMA(huart, Com_Buff, COM_BUFF_SIZE);
         __HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
     }
 }
