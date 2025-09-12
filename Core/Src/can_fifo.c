@@ -37,6 +37,7 @@ uint8_t fifo_get(CanFrame_t *f)
 
 /**
  * 在主循环中调用，尝试从FIFO发送CAN报文，发送失败就跳过，自带延时
+ * @note 按理来讲应该有更优雅的解决方式，期待后人改进
  */
 void can_send_from_fifo()
 {
