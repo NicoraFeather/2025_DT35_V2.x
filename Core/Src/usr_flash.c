@@ -2,7 +2,7 @@
 // Created by lak19 on 2025/9/13.
 //
 
-#include "usr_flash.h"
+#include "../Inc/usr_flash.h"
 
 #include <string.h>
 extern uint16_t can_id[4]; // 4 路 DT35 的 CAN ID
@@ -85,7 +85,7 @@ void DT35_Flash_Init()
  */
 void DT35_Flash_Update()
 {
-    float test[4] = {0.001, 0.001, 0.001, 0.001};
+    float test[4] = {0.002f, 0.002f, 0.101f, 0.101f};
     WriteFloatArrayToFlash(COEFFICIENT_ADDR, test, 4);
     HAL_Delay(2000); // 擦除整个扇区的时间
     WriteFloatArrayToFlash(COEFFICIENT_ADDR + 30, calib_b, 4);

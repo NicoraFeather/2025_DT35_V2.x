@@ -6,15 +6,16 @@
 
 #include <stdio.h>
 #include <string.h>
-
 #include "flash_F4xxxG.h"
 #include "usart.h"
+
 extern uint8_t run_flag;
 extern uint8_t calibration_flag;
-extern uint8_t flash_flag;             //flash擦除标志位
 extern uint8_t  calib_id;              // 当前正在标定的 DT35 编号
 extern uint16_t can_id[4];             // 4 路 DT35 的 CAN ID
 extern float calib_k[4], calib_b[4];   // 每个 DT35 的线性系数
+uint8_t flash_flag = 0;
+
 void USART_Parse_Command(char *str)
 {
     char resp[512] = {0};
@@ -65,10 +66,11 @@ void USART_Parse_Command(char *str)
         float k = 0.0f, b = 0.0f;
         if (sscanf(str + 18, "%d %f %f", &id, &k, &b) == 3 && id >= 0 && id <= 3)
         {
+            flash_flag = 1; // 标记参数已改，需要落盘
             calib_k[id] = k;
             calib_b[id] = b;
-            flash_flag = 1; // 标记参数已改，需要落盘
             sprintf(resp, "DT35-%d  k=%.4f  b=%.4f  written\r\n", id, k, b);
+
         }
         else
             strcpy(resp, "Error: calibration_write <id 0~3> <k> <b>\r\n");
@@ -79,12 +81,13 @@ void USART_Parse_Command(char *str)
         int i0, i1, i2, i3;
         if (sscanf(str + 14, "%d %d %d %d", &i0, &i1, &i2, &i3) == 4)
         {
+            flash_flag = 1; // 标记参数已改，需要落盘
             can_id[0] = (uint16_t)i0;
             can_id[1] = (uint16_t)i1;
             can_id[2] = (uint16_t)i2;
             can_id[3] = (uint16_t)i3;
-            flash_flag = 1; // 标记参数已改，需要落盘
             sprintf(resp, "CAN IDs  %d  %d  %d  %d  set\r\n", i0, i1, i2, i3);
+
         }
         else
             strcpy(resp, "Error: change_can_id needs 4 integers\r\n");

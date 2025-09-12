@@ -48,7 +48,7 @@ add_executable(${CMAKE_PROJECT_NAME}
         Lib/Src/flash_F4xxxG.c
         Lib/Inc/flash_F4xxxG.h
         Core/Src/usr_flash.c
-        Core/Src/usr_flash.h
+        Core/Inc/usr_flash.h
 )
 
 # Add STM32CubeMX generated sources

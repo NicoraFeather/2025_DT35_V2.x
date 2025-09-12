@@ -27,13 +27,14 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
 #include <string.h>
 
 #include "adc_scan.h"
 #include "../Inc/callback.h"
 #include "can_fifo.h"
 #include "flash_F4xxxG.h"
-#include "usr_flash.h"
+#include "../Inc/usr_flash.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -58,10 +59,10 @@ extern DMA_HandleTypeDef hdma_usart3_rx;
 extern DMA_HandleTypeDef hdma_usart1_rx;
 extern uint16_t can_id[4];             // 4 路 DT35 的 CAN ID
 extern float calib_k[4], calib_b[4]; // 每个 DT35 的线性系数
+extern CanFifo_t can_fifo;
 
 uint8_t Com_Buff[50]={0};
-uint8_t flash_flag = 0; //参数变更标志
-extern CanFifo_t can_fifo;
+//uint8_t flash_flag = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -120,7 +121,7 @@ int main(void)
   HAL_UARTEx_ReceiveToIdle_DMA(&huart1, Com_Buff, 50);
   __HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
   //DT35_Flash_Update(); //参数更新到Flash
-  DT35_Flash_Init(); // 从Flash读取参数
+  //DT35_Flash_Init(); // 从Flash读取参数
 
   HAL_TIM_Base_Start_IT(&htim10);
   /* USER CODE END 2 */
@@ -129,12 +130,16 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-     can_send_from_fifo();
-    if (flash_flag == 1)
-    {
-      flash_flag = 0;
-      DT35_Flash_Update(); //参数更新到Flash
-    }
+     //can_send_from_fifo();
+    // if (flash_flag == 1)
+    // {
+    //   flash_flag = 0;
+    //   uint8_t message[50] = {0};
+    //   sprintf((char *) message, "Parameters updated to Flash\r\n");
+    //   HAL_UART_Transmit(&huart3, message, strlen((char *) message), HAL_MAX_DELAY);
+    //   calib_b[0] = 1000;
+    //   //DT35_Flash_Update(); //参数更新到Flash
+    // }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
