@@ -32,7 +32,8 @@
 #include "adc_scan.h"
 #include "../Inc/callback.h"
 #include "can_fifo.h"
-#include "flash_param.h"
+#include "flash_F4xxxG.h"
+#include "usr_flash.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -59,7 +60,7 @@ extern uint16_t can_id[4];             // 4 路 DT35 的 CAN ID
 extern float calib_k[4], calib_b[4]; // 每个 DT35 的线性系数
 
 uint8_t Com_Buff[50]={0};
-uint8_t param_flag = 0; //参数变更标志
+uint8_t flash_flag = 0; //参数变更标志
 extern CanFifo_t can_fifo;
 /* USER CODE END PV */
 
@@ -112,20 +113,16 @@ int main(void)
   MX_CAN1_Init();
   /* USER CODE BEGIN 2 */
   ADC_Init();
-  HAL_TIM_Base_Start_IT(&htim10);
 
   HAL_UARTEx_ReceiveToIdle_DMA(&huart3, Com_Buff, 50);
   __HAL_DMA_DISABLE_IT(&hdma_usart3_rx, DMA_IT_HT);
 
   HAL_UARTEx_ReceiveToIdle_DMA(&huart1, Com_Buff, 50);
   __HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
+  //DT35_Flash_Update(); //参数更新到Flash
+  DT35_Flash_Init(); // 从Flash读取参数
 
-  /* 上电就读 */
-  // PARAM_Load();
-  // /* 把值灌进业务变量 */
-  // memcpy(calib_k,  param.k,     sizeof(param.k));
-  // memcpy(calib_b,  param.b,     sizeof(param.b));
-  // memcpy(can_id,   param.can_id,sizeof(param.can_id));
+  HAL_TIM_Base_Start_IT(&htim10);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -133,16 +130,11 @@ int main(void)
   while (1)
   {
      can_send_from_fifo();
-    // if (param_flag == 1)
-    // {
-    //   param_flag = 0;
-    //   memcpy(param.k,     calib_k,  sizeof(param.k));
-    //   memcpy(param.b,     calib_b,  sizeof(param.b));
-    //   memcpy(param.can_id, can_id, sizeof(param.can_id));
-    //   /* 一键落盘 */
-    //   PARAM_Save();
-    // }
-
+    if (flash_flag == 1)
+    {
+      flash_flag = 0;
+      DT35_Flash_Update(); //参数更新到Flash
+    }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

@@ -19,10 +19,10 @@ extern uint16_t ADC_values[4]; //0~4095的整形数值
 float calib_k[4] = {0.0f, 0.00115245f, 0.0f, 0.0f}; // 每个 DT35 的线性系数
 float calib_b[4] = {0.0f, 0.04327176f, 0.0f, 0.0f}; // 每个 DT35 的线性系数
 int i = 0;//定时器计数
-uint8_t run_flag = 0;
+uint8_t run_flag = 1;
 uint8_t calibration_flag = 0;
 uint8_t calib_id; // 当前正在标定的 DT35 编号
-uint16_t can_id[4] = {0x60, 0x61, 0x62, 0x63}; // 4 路 DT35 的 CAN ID
+uint16_t can_id[4] = {0x060, 0x061, 0x062, 0x063}; // 4 路 DT35 的 CAN ID
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) //10ms定时器回调函数
 {
@@ -46,28 +46,33 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) //10ms定时器回�
             {
                 sprintf((char *) msg, "%d\r\n", ADC_values[1]); //检测到标志位后直接覆盖数据
             }
-            //sprintf((char *) msg, "%d %d %d %d\r\n", ADC_values[0], ADC_values[1], ADC_values[2], ADC_values[3]);  //ADC数据
-            //sprintf((char *) msg, "%d %d %d %d\r\n", (uint32_t)script_data[0], (uint32_t)script_data[1], (uint32_t)script_data[2], (uint32_t)script_data[3]);
+
 
             if (run_flag == 1)
             {
-                //UART发送距离数据
+                //sprintf((char *) msg, "%d %d %d %d\r\n", can_id[0], can_id[1], can_id[2], can_id[3]);
                 HAL_UART_Transmit(&huart1, msg, strlen(msg),HAL_MAX_DELAY);
                 HAL_UART_Transmit(&huart3, msg, strlen(msg),HAL_MAX_DELAY);
-                // CAN消息塞进队列
-                for (int i = 0; i < 4; i++)
-                {
-                    CanFrame_t f;
-                    f.can_id = can_id[i];
-                    memcpy(&f.data[0], &distance[i], 4); /* float */
-                    memset(&f.data[4], 0, 4);
-                    fifo_put(&f); /* 非阻塞，失败就丢帧 */
-                }
+
+                //sprintf((char *) msg, "%f %f %f %f\r\n", calib_k[0], calib_k[1], calib_k[2], calib_k[3]);
+                //HAL_UART_Transmit(&huart1, msg, strlen(msg),HAL_MAX_DELAY);
+                //HAL_UART_Transmit(&huart3, msg, strlen(msg),HAL_MAX_DELAY);
+
             }
+            // test sscanf
             // float x;
             // int   n = sscanf("3.1415", "%f", &x);
             // sprintf(msg, "sscanf ret=%d  x=%.5f\r\n", n, x);
             // HAL_UART_Transmit(&huart1, msg, strlen(msg), HAL_MAX_DELAY);
+        }
+        // 100ms更新一次CAN发送
+        for (int i = 0; i < 4; i++)
+        {
+            CanFrame_t f;
+            f.can_id = can_id[i];
+            memcpy(&f.data[0], &distance[i], 4); /* float */
+            memset(&f.data[4], 0, 4);
+            fifo_put(&f); /* 非阻塞，失败就丢帧 */
         }
     }
 }

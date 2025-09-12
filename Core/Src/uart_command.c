@@ -7,14 +7,14 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "flash_param.h"
+#include "flash_F4xxxG.h"
 #include "usart.h"
 extern uint8_t run_flag;
 extern uint8_t calibration_flag;
-extern uint8_t param_flag;
+extern uint8_t flash_flag;             //flash擦除标志位
 extern uint8_t  calib_id;              // 当前正在标定的 DT35 编号
 extern uint16_t can_id[4];             // 4 路 DT35 的 CAN ID
-extern float calib_k[4], calib_b[4]; // 每个 DT35 的线性系数
+extern float calib_k[4], calib_b[4];   // 每个 DT35 的线性系数
 void USART_Parse_Command(char *str)
 {
     char resp[512] = {0};
@@ -67,7 +67,7 @@ void USART_Parse_Command(char *str)
         {
             calib_k[id] = k;
             calib_b[id] = b;
-            param_flag = 1; // 标记参数已改，需要落盘
+            flash_flag = 1; // 标记参数已改，需要落盘
             sprintf(resp, "DT35-%d  k=%.4f  b=%.4f  written\r\n", id, k, b);
         }
         else
@@ -83,7 +83,7 @@ void USART_Parse_Command(char *str)
             can_id[1] = (uint16_t)i1;
             can_id[2] = (uint16_t)i2;
             can_id[3] = (uint16_t)i3;
-            param_flag = 1; // 标记参数已改，需要落盘
+            flash_flag = 1; // 标记参数已改，需要落盘
             sprintf(resp, "CAN IDs  %d  %d  %d  %d  set\r\n", i0, i1, i2, i3);
         }
         else
@@ -100,7 +100,7 @@ void USART_Parse_Command(char *str)
     {
         /* 一次拼完再发，减少 DMA 次数 */
         int n = 0;
-        n += sprintf(resp + n, "ADC  CAN   k          b\r\n");
+        n += sprintf(resp + n, "ADC  CAN   k         b\r\n");
         for (int i = 0; i < 4; i++)
         {
             n += sprintf(resp + n, "ADC%d %04X  %f  %f\r\n",

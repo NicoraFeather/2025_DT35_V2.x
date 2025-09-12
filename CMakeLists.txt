@@ -45,8 +45,10 @@ add_executable(${CMAKE_PROJECT_NAME}
         Lib/Src/functional.c
         Core/Src/can_fifo.c
         Core/Inc/can_fifo.h
-        Lib/Src/flash_param.c
-        Lib/Inc/flash_param.h
+        Lib/Src/flash_F4xxxG.c
+        Lib/Inc/flash_F4xxxG.h
+        Core/Src/usr_flash.c
+        Core/Src/usr_flash.h
 )
 
 # Add STM32CubeMX generated sources
