@@ -131,13 +131,13 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-     //can_send_from_fifo();
+     can_send_from_fifo();
     if (Flash_flag == 1)
     {
       Flash_flag = 0;
-      // uint8_t message[50] = {0};
-      // sprintf((char *) message, "Parameters updated to Flash\r\n");
-      // HAL_UART_Transmit(&huart1, message, strlen((char *) message), HAL_MAX_DELAY);
+      uint8_t message[50] = {0};
+      sprintf((char *) message, "Parameters updated to Flash\r\n");
+      HAL_UART_Transmit(&huart1, message, strlen((char *) message), HAL_MAX_DELAY);
       DT35_Flash_Update(); //参数更新到Flash
      }
 

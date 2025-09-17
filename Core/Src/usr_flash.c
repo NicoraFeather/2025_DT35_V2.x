@@ -77,6 +77,7 @@ void DT35_Flash_Init()
     STMFLASH_ReadFloatArray(COEFFICIENT_ADDR, calib_k, 4);
     STMFLASH_ReadFloatArray(COEFFICIENT_ADDR + 30, calib_b, 4);
     STMFLASH_ReadUint16Array(CAN_ID_ADDR, can_id, 4);
+    HAL_Delay(10);
 }
 
 /**
@@ -85,8 +86,8 @@ void DT35_Flash_Init()
  */
 void DT35_Flash_Update()
 {
-    float test[4] = {0.002f, 0.002f, 0.101f, 0.101f};
-    WriteFloatArrayToFlash(COEFFICIENT_ADDR, test, 4);
+    //float test[4] = {0.002f, 0.002f, 0.101f, 0.101f};
+    WriteFloatArrayToFlash(COEFFICIENT_ADDR, calib_k, 4);
     HAL_Delay(2000); // 擦除整个扇区的时间
     WriteFloatArrayToFlash(COEFFICIENT_ADDR + 30, calib_b, 4);
     HAL_Delay(100);  //由于已经擦除，写入时间很短

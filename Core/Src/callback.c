@@ -21,7 +21,7 @@ extern uint8_t Flash_flag;
 float calib_k[4] = {0.0f, 0.00115245f, 0.0f, 0.0f}; // 每个 DT35 的线性系数
 float calib_b[4] = {0.0f, 0.04327176f, 0.0f, 0.0f}; // 每个 DT35 的线性系数
 int i = 0;//定时器计数
-uint8_t run_flag = 0;
+uint8_t run_flag = 1;
 uint8_t calibration_flag = 0;
 uint8_t calib_id; // 当前正在标定的 DT35 编号
 uint16_t can_id[4] = {0x060, 0x061, 0x062, 0x063}; // 4 路 DT35 的 CAN ID
@@ -31,15 +31,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) //10ms定时器回�
 
     if (htim->Instance == TIM10) //10ms定时器
     {
-        // if (flash_flag == 1)
-        // {
-        //     flash_flag = 0;
-        //     //uint8_t message[50] = {0};
-        //     //sprintf((char *) message, "Parameters updated to Flash\r\n");
-        //     //HAL_UART_Transmit(&huart1, message, strlen((char *) message), HAL_MAX_DELAY);
-        //     calib_b[0] = 1000;
-        //     //DT35_Flash_Update(); //参数更新到Flash
-        // }
         i++;
         float distance[4];
         for (uint8_t j = 0; j < 4; j++)
@@ -60,23 +51,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) //10ms定时器回�
 
             if (run_flag == 1)
             {
-                //sprintf((char *) msg, "%d %d %d %d\r\n", can_id[0], can_id[1], can_id[2], can_id[3]);
                 HAL_UART_Transmit(&huart1, msg, strlen(msg),HAL_MAX_DELAY);
                 HAL_UART_Transmit(&huart3, msg, strlen(msg),HAL_MAX_DELAY);
-
-                //sprintf((char *) msg, "%f %f %f %f\r\n", calib_k[0], calib_k[1], calib_k[2], calib_k[3]);
-                //HAL_UART_Transmit(&huart1, msg, strlen(msg),HAL_MAX_DELAY);
-                //HAL_UART_Transmit(&huart3, msg, strlen(msg),HAL_MAX_DELAY);
-
             }
-
-            // test sscanf
-            // float x;
-            // int   n = sscanf("3.1415", "%f", &x);
-            // sprintf(msg, "sscanf ret=%d  x=%.5f\r\n", n, x);
-            // HAL_UART_Transmit(&huart1, msg, strlen(msg), HAL_MAX_DELAY);
         }
-        // 100ms更新一次CAN发送
         for (int i = 0; i < 4; i++)
         {
             CanFrame_t f;

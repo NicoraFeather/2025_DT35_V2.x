@@ -35,7 +35,7 @@ void USART_Parse_Command(char *str)
             "calibration_mode <id>    -- enter linear calib mode (id 0~3)\r\n"
             "calibration_mode_off     -- exit calibration mode\r\n"
             "calibration_write <id> <k> <b> -- write k,b for id\r\n"
-            "change_can_id <id0> <id1> <id2> <id3> -- set CAN IDs\r\n"
+            "change_can_id <id0> <id1> <id2> <id3> -- set CAN IDs(DEC)\r\n"
             "show                     -- display ADC0~3 CAN addr, k, b\r\n";
         strcpy(resp, msg);
     }
@@ -97,12 +97,6 @@ void USART_Parse_Command(char *str)
         else
             strcpy(resp, "Error: change_can_id needs 4 integers\r\n");
     }
-    /* 新增：关闭标定模式 -------------------------------------------*/
-    else if (strcmp(str, "calibration_mode_off") == 0)
-    {
-        calibration_flag = 0;
-        strcpy(resp, "Calibration mode OFF\r\n");
-    }
     /* 展示 ADC0~ADC3 的 CAN 地址、k、b -----------------------*/
     else if (strcmp(str, "show") == 0)
     {
@@ -111,8 +105,14 @@ void USART_Parse_Command(char *str)
         for (int i = 0; i < 4; i++)
         {
             n += sprintf(resp + n, "ADC%d %04X  %f  %f\r\n",
-                         Flash_flag, can_id[i], calib_k[i], calib_b[i]);
+                         i, can_id[i], calib_k[i], calib_b[i]);
         }
+    }
+    /* 新增：关闭标定模式 -------------------------------------------*/
+    else if (strcmp(str, "calibration_mode_off") == 0)
+    {
+        calibration_flag = 0;
+        strcpy(resp, "Calibration mode OFF\r\n");
     }
     /* unknown ----------------------------------------------------------*/
     else
@@ -121,6 +121,7 @@ void USART_Parse_Command(char *str)
     }
 
     HAL_UART_Transmit(&huart1, (uint8_t *)resp, strlen(resp), HAL_MAX_DELAY);
+    HAL_UART_Transmit(&huart3, (uint8_t *)resp, strlen(resp), HAL_MAX_DELAY);
 
     /* 清空接收缓冲区 */
     memset(str, 0, COM_BUFF_SIZE);
