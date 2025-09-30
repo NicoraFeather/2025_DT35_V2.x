@@ -1,29 +1,32 @@
 //
-// Created by lak19 on 2025/9/7.
+// Created by lak19 on 2025/9/25.
 //
 
 #ifndef CAN_FIFO_H
 #define CAN_FIFO_H
 
-#include <stdint.h>
-#include "stm32f4xx.h"
+#include "main.h"
+#include "can.h"
 
-#define FIFO_SIZE 32 //循环队列大小
+/* 软件 FIFO 深度，大于 4 即可，这里给 8 */
+#define CAN_SW_TX_FIFO_SIZE 8
 
-// CAN 帧结构体
-typedef struct {
-    uint16_t can_id;   /* 100..103 */
-    uint8_t  data[8];  /* 4 字节 float + 4 字节保留 */
-} CanFrame_t;
+typedef struct
+{
+    uint16_t id; //CAN ID
+    uint8_t len; //数据长度
+    uint8_t data[8]; //数组数据
+} CanSwTxMsg_t; //CAN报文结构体
 
-/* 环形 FIFO，主循环消费，定时器中断生产 */
-typedef struct {
-    CanFrame_t frame[FIFO_SIZE];
-    uint8_t head;
-    uint8_t tail;
-} CanFifo_t;
+typedef struct
+{
+    CanSwTxMsg_t buf[CAN_SW_TX_FIFO_SIZE]; //CAN报文FIFO队列缓存
+    uint8_t head; //队头
+    uint8_t tail; //队尾
+    uint8_t used; //已用空间
+} CanSwTxFifo_t; //CAN报文FIFO队列结构体
 
-uint8_t fifo_get(CanFrame_t *f);
-uint8_t fifo_put(const CanFrame_t *f);
-void can_send_from_fifo();
+uint8_t CanTxFifo_Put(uint16_t id, const uint8_t *data, uint8_t len);
+void MX_CAN_StartWithIT(CAN_HandleTypeDef *hcan);//开启CAN并开启CAN中断
+void CAN_SendFromFifo(CAN_HandleTypeDef *hcan);//尝试从FIFO发送CAN报文
 #endif //CAN_FIFO_H

@@ -74,7 +74,7 @@ void USART_Parse_Command(char *str)
             Flash_flag = 1; // 标记参数已改，需要落盘
             calib_k[id] = k;
             calib_b[id] = b;
-            sprintf(resp, "DT35-%d  k=%.4f  b=%.4f  written\r\n", id, k, b);
+            sprintf(resp, "DT35-%d  k=%f  b=%f  written\r\n", id, k, b);
 
         }
         else
@@ -101,10 +101,10 @@ void USART_Parse_Command(char *str)
     else if (strcmp(str, "show") == 0)
     {
         int n = 0;
-        n += sprintf(resp + n, "ADC  CAN   k         b\r\n");
+        n += sprintf(resp + n, "ADC  CAN   k           b\r\n");
         for (int i = 0; i < 4; i++)
         {
-            n += sprintf(resp + n, "ADC%d %04X  %f  %f\r\n",
+            n += sprintf(resp + n, "ADC%d %04X  %.8f  %.8f\r\n",
                          i, can_id[i], calib_k[i], calib_b[i]);
         }
     }

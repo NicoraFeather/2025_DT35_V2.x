@@ -26,6 +26,18 @@ uint8_t calibration_flag = 0;
 uint8_t calib_id; // 当前正在标定的 DT35 编号
 uint16_t can_id[4] = {0x060, 0x061, 0x062, 0x063}; // 4 路 DT35 的 CAN ID
 
+/**
+ * 将一个float类型变量转换为一条can消息
+ * @param val 待转换变量
+ * @param id can消息ID
+ */
+void Float_PutOne(float val, uint32_t id)
+{
+    uint8_t buf[8] = {0};
+    memcpy(buf, &val, 4);
+    CanTxFifo_Put(id, buf, 8);
+}
+
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) //10ms定时器回调函数
 {
 
@@ -37,7 +49,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) //10ms定时器回�
         {
             distance[j] = calib_k[j] * ADC_values[j] + calib_b[j];
         }
-        if (i >= 10)
+        if (i >= 5)
         {
             i = 0;
 
@@ -46,7 +58,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) //10ms定时器回�
 
             if (calibration_flag == 1)
             {
-                sprintf((char *) msg, "%d\r\n", ADC_values[1]); //检测到标志位后直接覆盖数据
+                sprintf((char *) msg, "%d\r\n", ADC_values[calib_id]); //检测到标志位后直接覆盖数据
             }
 
             if (run_flag == 1)
@@ -55,14 +67,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) //10ms定时器回�
                 HAL_UART_Transmit(&huart3, msg, strlen(msg),HAL_MAX_DELAY);
             }
         }
-        for (int i = 0; i < 4; i++)
+        for (uint8_t j = 0; j < 4; j++)
         {
-            CanFrame_t f;
-            f.can_id = can_id[i];
-            memcpy(&f.data[0], &distance[i], 4); /* float */
-            memset(&f.data[4], 0, 4);
-            fifo_put(&f); /* 非阻塞，失败就丢帧 */
+            Float_PutOne(distance[j], can_id[j]);
         }
+        CAN_SendFromFifo(&hcan1); //发送can
     }
 }
 

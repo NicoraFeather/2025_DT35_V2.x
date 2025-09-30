@@ -60,7 +60,6 @@ extern DMA_HandleTypeDef hdma_usart3_rx;
 extern DMA_HandleTypeDef hdma_usart1_rx;
 extern uint16_t can_id[4];             // 4 路 DT35 的 CAN ID
 extern float calib_k[4], calib_b[4]; // 每个 DT35 的线性系数
-extern CanFifo_t can_fifo;
 
 uint8_t Com_Buff[COM_BUFF_SIZE]={0};
 uint8_t Flash_flag = 0;
@@ -123,7 +122,7 @@ int main(void)
   __HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
 
   DT35_Flash_Init(); // 从Flash读取参数
-
+  MX_CAN_StartWithIT(&hcan1); //开启CAN中断
   HAL_TIM_Base_Start_IT(&htim10);
   /* USER CODE END 2 */
 
@@ -131,7 +130,6 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-     can_send_from_fifo();
     if (Flash_flag == 1)
     {
       Flash_flag = 0;
