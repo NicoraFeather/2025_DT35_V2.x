@@ -135,8 +135,9 @@ int main(void)
       Flash_flag = 0;
       uint8_t message[50] = {0};
       sprintf((char *) message, "Parameters updated to Flash\r\n");
-      HAL_UART_Transmit(&huart1, message, strlen((char *) message), HAL_MAX_DELAY);
       DT35_Flash_Update(); //参数更新到Flash
+      HAL_UART_Transmit(&huart1, message, strlen((char *) message), HAL_MAX_DELAY);
+      HAL_UART_Transmit(&huart3, message, strlen((char *) message), HAL_MAX_DELAY);
      }
 
     /* USER CODE END WHILE */
