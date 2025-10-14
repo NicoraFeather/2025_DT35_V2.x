@@ -57,7 +57,7 @@ extern DMA_HandleTypeDef hdma_usart3_rx;
 extern DMA_HandleTypeDef hdma_usart1_rx;
 extern uint16_t can_id[4];             // 4 路 DT35 的 CAN ID
 extern float calib_k[4], calib_b[4]; // 每个 DT35 的线性系数
-
+extern float can_data[4];         // 4 路 DT35 的距离数据
 uint8_t Com_Buff[50]={0};
 extern uint8_t param_flag;
 extern CanFifo_t can_fifo;
@@ -71,7 +71,21 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void float_to_u8(float f, uint8_t u8[4])
+{
+  uint32_t w;
+  memcpy(&w, &f, 4); // 拿到 IEEE-754 位模式
 
+  // 小端：最低位字节在前
+  u8[0] = (w >> 0) & 0xFF;
+  u8[1] = (w >> 8) & 0xFF;
+  u8[2] = (w >> 16) & 0xFF;
+  u8[3] = (w >> 24) & 0xFF;
+  u8[4] = 0;
+  u8[5] = 0;
+  u8[6] = 0;
+  u8[7] = 0;
+}
 /* USER CODE END 0 */
 
 /**
@@ -125,8 +139,13 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-     can_send_from_fifo();
-
+    for (int i = 0; i < 2; i++)
+    {
+      uint8_t data[8] = {0};
+      float_to_u8(can_data[i], data);
+      CAN_SendMessage(&hcan1, can_id[i], data, 8);
+    }
+    HAL_Delay(10-1); // 10ms 发送一次
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
