@@ -22,8 +22,8 @@ float calib_k[4] = {0.0f, 0.00115245f, 0.0f, 0.0f}; // 每个 DT35 的线性系�
 float calib_b[4] = {0.0f, 0.04327176f, 0.0f, 0.0f}; // 每个 DT35 的线性系数
 int i = 0;//定时器计数
 uint8_t run_flag = 1;
-uint8_t calibration_flag = 0;
-uint8_t calib_id; // 当前正在标定的 DT35 编号
+uint8_t calibration_flag = 1;
+uint8_t calib_id = 0; // 当前正在标定的 DT35 编号
 uint16_t can_id[4] = {0x060, 0x061, 0x062, 0x063}; // 4 路 DT35 的 CAN ID
 
 /**
