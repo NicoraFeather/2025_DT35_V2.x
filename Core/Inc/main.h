@@ -59,6 +59,7 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 
 /* USER CODE BEGIN Private defines */
+  void float_to_u8(float f, uint8_t u8[4]);
 
 /* USER CODE END Private defines */
 

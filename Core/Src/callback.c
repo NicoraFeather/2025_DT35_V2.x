@@ -54,5 +54,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) //10ms定时器回�
             }
             // CAN消息塞进队列
         }
+        for (int i = 0; i < 2; i++)
+        {
+            uint8_t data[8] = {0};
+            float_to_u8(can_data[i], data);
+            CAN_SendMessage(&hcan1, can_id[i], data, 8);
+        }
+        //HAL_Delay(10); // 10ms 发送一次
     }
 }
