@@ -6,7 +6,7 @@
 #define USR_FLASH_H
 
 #include "flash_F4xxxG.h"
-#define  COEFFICIENT_ADDR 0x080A1000 // 存储线性系数的起始地址
+#define  COEFFICIENT_ADDR 0x080C4000 // 存储线性系数的起始地址
 #define  CAN_ID_ADDR     0x080A1080 // 存储 CAN ID 的起始地址
 
 void STMFLASH_ReadFloatArray(uint32_t start_addr, float* float_array, int array_size);
